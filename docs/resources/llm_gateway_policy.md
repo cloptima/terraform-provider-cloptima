@@ -88,7 +88,7 @@ A Cloptima managed LLM gateway governance policy: model/provider allow-deny list
 - `routing_adaptive_candidate_set_version` (String) Version label for this policy's candidate model set, for audit and rollback tracking.
 - `routing_adaptive_enabled` (Boolean) Enable adaptive routing (workload-tier model substitution) for this policy.
 - `routing_adaptive_medium_risk_approved` (Boolean) Explicit confirmation required alongside routing_adaptive_risk_ceiling = "medium" in canary/enforce mode.
-- `routing_adaptive_mode` (String) Adaptive routing mode: observe, canary, or enforce. Only meaningful when routing_adaptive_enabled is true.
+- `routing_adaptive_mode` (String) Adaptive routing mode: off, observe, canary, or enforce. Only meaningful when routing_adaptive_enabled is true.
 - `routing_adaptive_risk_ceiling` (String) Maximum acceptable substitution risk tier: low, medium, or high. medium in canary/enforce mode additionally requires routing_adaptive_medium_risk_approved.
 - `routing_adaptive_rollback_cooldown_minutes` (Number) Cooldown in minutes after a rollback before re-evaluation resumes, 5-1440. Required in canary/enforce mode; defaults to 30 there.
 - `routing_adaptive_rollback_evaluation_window_minutes` (Number) Rollback evaluation window in minutes, 5-1440. Required in canary/enforce mode; defaults to 30 there.

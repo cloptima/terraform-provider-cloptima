@@ -26,13 +26,12 @@ A Cloptima virtual key: an inference-scoped credential (ai:invoke) used to authe
 - `default_credential_ids` (String) Per-provider default credential IDs as a JSON object.
 - `environment` (String) Authoritative environment attribution for requests made with this virtual key.
 - `expires_in_days` (Number) Virtual key lifetime in days from creation. Changing this value replaces the virtual key (a new secret is minted) rather than updating it in place.
-- `membership_id` (String) Membership ID this virtual key is issued under. Immutable after creation.
+- `membership_id` (String) Membership ID this virtual key is issued under. Defaults to the calling identity's own membership when omitted. Immutable after creation.
 - `team_id` (String) Authoritative team attribution for requests made with this virtual key.
 
 ### Read-Only
 
 - `access_token` (String, Sensitive) The raw virtual key value. Returned only once at creation and retained only in Terraform state.
-- `actor_id` (String) Actor ID this virtual key resolves to for attribution.
 - `created_at` (String) Creation timestamp.
 - `customer_id` (String) Owning customer ID.
 - `env_var` (String) Suggested environment variable name for this virtual key.

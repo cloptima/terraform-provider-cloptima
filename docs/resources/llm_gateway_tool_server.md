@@ -24,9 +24,9 @@ A registered MCP tool server, referenced by name from cloptima_llm_gateway_polic
 - `allowed_tool_names` (List of String) Allowed tool names on this server.
 - `apply_immediately` (Boolean) When true and the applying identity has the required role, requesting status = "active" is approved and activated in the same apply. Otherwise, the request follows the standard approval flow. Defaults to false when omitted.
 - `denied_tool_names` (List of String) Denied tool names on this server; deny wins over allow.
-- `server_type` (String) Tool server type.
+- `server_type` (String) Tool server type: mcp, openapi, function, or custom. Defaults to mcp when omitted.
 - `server_url` (String) Tool server URL.
-- `status` (String) Requested status: active or disabled. See effective_status for the current approved status, which may differ while activation approval is pending.
+- `status` (String) Requested status: active, disabled, or archived. See effective_status for the current approved status, which may differ while activation approval is pending.
 
 ### Read-Only
 
