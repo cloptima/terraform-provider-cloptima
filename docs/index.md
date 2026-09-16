@@ -16,5 +16,5 @@ Provisions Cloptima managed LLM gateway governance resources: policies, policy b
 
 ### Optional
 
-- `endpoint` (String) Cloptima API endpoint, e.g. https://api.cloptima.ai/graphql. Defaults to the CLOPTIMA_ENDPOINT environment variable.
+- `endpoint` (String) Cloptima API endpoint. Defaults to https://api.cloptima.ai/graphql (or the CLOPTIMA_ENDPOINT environment variable, if set) - you should not need to set this unless directed by Cloptima support, e.g. to target a non-production environment.
 - `pat_token` (String, Sensitive) Personal access token with the ai:admin scope, minted by an org owner/admin. Defaults to the CLOPTIMA_PAT environment variable.
