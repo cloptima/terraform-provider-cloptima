@@ -26,19 +26,15 @@ terraform {
 }
 
 provider "cloptima" {
-  # Configuration can also be set via environment variables:
-  # CLOPTIMA_ENDPOINT and CLOPTIMA_PAT
-  endpoint  = "https://api.cloptima.ai/graphql"
+  # pat_token can also be set via the CLOPTIMA_PAT environment variable.
   pat_token = var.cloptima_pat_token
 }
 ```
 
 ### Authentication
 
-The provider can be configured with:
-
-- `endpoint`: The Cloptima API Gateway GraphQL endpoint (or via `CLOPTIMA_ENDPOINT` environment variable).
-- `pat_token`: Personal Access Token with the `ai:admin` scope (or via `CLOPTIMA_PAT` environment variable).
+- `pat_token`: Personal Access Token with the `ai:admin` scope (or via the `CLOPTIMA_PAT` environment variable). Required.
+- `endpoint`: Defaults to `https://api.cloptima.ai/graphql` and should not be set unless Cloptima support directs you to target a non-production environment (or via the `CLOPTIMA_ENDPOINT` environment variable).
 
 ## Example Usage
 
