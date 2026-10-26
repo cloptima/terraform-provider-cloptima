@@ -35,12 +35,12 @@ resource "cloptima_llm_gateway_policy_binding" "analytics_prod" {
 
 ### Optional
 
-- `acknowledge_overlap` (Boolean) Set to true to acknowledge that this binding overlaps an existing scope. This apply-time acknowledgement is retained in Terraform state and does not affect policy matching.
+- `acknowledge_overlap` (Boolean) Set to true to allow this binding to overlap an existing binding when either uses a non-default priority, after reviewing the order the apply error reports. Only checked when the binding's scope or priority changes. Retained in Terraform state; it does not affect policy matching.
 - `actor_type` (String) Actor type this binding applies to: human or service. Omit to match any actor type.
 - `app_id` (String) App ID this binding applies to. Omit to match any app.
 - `environment` (String) Environment this binding applies to. Omit to match any environment.
 - `principal_id` (String) Specific principal ID this binding applies to. To target one virtual key, use that cloptima_llm_virtual_key resource's id. Omit to match any principal.
-- `priority` (Number) Match priority; lower values are preferred among otherwise-tied bindings.
+- `priority` (Number) Match priority, default 100. When multiple bindings match a request, the lowest priority number takes precedence before scope specificity is evaluated.
 - `team_id` (String) Team ID this binding applies to. Omit to match any team.
 
 ### Read-Only

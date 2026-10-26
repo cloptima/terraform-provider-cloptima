@@ -131,6 +131,49 @@ output "telemetry_access_token" {
 
 ---
 
+## Budgets Across Edge Gateways
+
+Edge gateways do not have budgets of their own. A policy's `daily_budget_usd` and `monthly_budget_usd`, and the organization-wide ceiling on the baseline policy, are shared by the cloud gateway and every edge gateway in your organization:
+
+- Under a blocking budget (`budget_mode = "hard"`), each edge gateway holds a share of the budget's remaining room for the current UTC day, also counted toward the organization ceiling. It admits requests against that share locally and asks Cloptima for more in the background.
+- Cloptima sizes each share from the room left in the budget and never grants more than that room, so all gateways together stay within one budget.
+- Each edge gateway reports its spend about every 30 seconds. When the UTC day ends, the day's share closes at what the edge actually spent.
+- If an edge gateway asks Cloptima for more budget and the request fails, the policy's `fail_mode` decides: `fail_closed` refuses requests that need more budget, and `fail_open` keeps serving and counts the spend.
+- If an edge gateway has lost contact with Cloptima, the policy's `edge_offline_keep_serving` decides instead. When it is `true` (the default), the edge gateway keeps serving for up to 24 hours and applies the spend to your budgets when it reconnects. When it is `false`, the edge gateway serves only within the budget share it already holds.
+
+There is nothing to configure for this: share sizes and refresh timing are managed by Cloptima. To give one group of edge gateways a budget of its own, bind a separate policy to the virtual keys or environment that group serves:
+
+```terraform
+resource "cloptima_llm_gateway_policy" "org_baseline" {
+  name               = "org-baseline"
+  is_baseline        = true
+  budget_mode        = "hard"
+  monthly_budget_usd = 40000.00
+}
+
+resource "cloptima_llm_gateway_policy" "eu_edge" {
+  name             = "eu-edge-production"
+  mode             = "enforce"
+  budget_mode      = "hard"
+  daily_budget_usd = 500.00
+}
+
+resource "cloptima_llm_gateway_policy_binding" "eu_edge" {
+  policy_id   = cloptima_llm_gateway_policy.eu_edge.id
+  environment = "production-eu"
+}
+
+# Confirm what governs that traffic before it arrives
+data "cloptima_llm_gateway_effective_policy" "eu_edge" {
+  environment = "production-eu"
+  actor_type  = "service"
+
+  depends_on = [cloptima_llm_gateway_policy_binding.eu_edge]
+}
+```
+
+---
+
 ## Step 4: Lifecycle
 
 - **Lease renewal**: A running edge gateway keeps its lease current with Cloptima automatically.

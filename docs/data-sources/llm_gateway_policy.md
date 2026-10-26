@@ -37,19 +37,21 @@ output "policy_allowed_models" {
 - `allowed_providers` (List of String) Allowed LLM provider IDs.
 - `allowed_tool_names` (List of String) Allowed tool names across all tool servers.
 - `allowed_tool_servers` (List of String) Allowed tool server names.
-- `budget_mode` (String) Budget enforcement mode: observe, soft, hard_fast, or hard_strict.
+- `budget_mode` (String) Budget enforcement mode: observe, soft, or hard.
 - `created_at` (String) Creation timestamp.
 - `customer_id` (String) Owning customer ID.
 - `daily_budget_usd` (Number) Daily spend ceiling in USD.
 - `denied_models` (List of String) Denied canonical model names.
 - `denied_tool_names` (List of String) Denied tool names across all tool servers.
 - `denied_tool_servers` (List of String) Denied tool server names.
+- `edge_offline_keep_serving` (Boolean) Whether an edge gateway that loses contact with Cloptima keeps serving for up to 24 hours, counting spend on the edge and applying it to your budgets when it reconnects.
 - `exact_cache_enabled` (Boolean) Whether exact match caching is enabled.
 - `exact_cache_mode` (String) Exact cache mode: off, observe, or enforce.
 - `fail_mode` (String) Policy enforcement behavior when a required service is unavailable: fail_open or fail_closed.
+- `is_baseline` (Boolean) Whether this policy is the organization baseline, applied to every request together with its winning policy.
 - `mode` (String) Policy enforcement mode: observe or enforce.
 - `monthly_budget_usd` (Number) Monthly spend ceiling in USD.
 - `prompt_retention_mode` (String) Prompt/response retention mode for audit logging: none, metadata_only, tool_io, or full.
 - `semantic_cache_enabled` (Boolean) Whether semantic similarity caching is enabled.
-- `semantic_cache_mode` (String) Semantic cache mode: off, observe, suggest, or enforce.
+- `semantic_cache_mode` (String) Semantic cache mode: off, observe, or enforce.
 - `updated_at` (String) Last update timestamp.

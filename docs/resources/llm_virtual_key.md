@@ -61,7 +61,7 @@ output "copilot_virtual_key_token" {
 - `expires_at` (String) Expiry timestamp, if any.
 - `id` (String) Virtual key ID.
 - `masked_access_token` (String) A masked/displayable form of the virtual key value.
-- `resolved_policy_preview` (Attributes) The gateway policy this virtual key resolved to at issue time, given its team/app/environment scope - the same governance preview a console admin would see. Set only at creation; not refreshed on subsequent reads. (see [below for nested schema](#nestedatt--resolved_policy_preview))
+- `resolved_policy_preview` (Attributes) The gateway policy this virtual key resolved to at issue time, given its team/app/environment scope - the same governance preview a console admin would see. Values are effective: the winning policy with the organization baseline applied. effective_daily_budget_usd and effective_monthly_budget_usd are the winning policy's own budgets; org_daily_budget_usd and org_monthly_budget_usd are the baseline's ceiling on all gateway spend. Set only at creation; not refreshed on subsequent reads. (see [below for nested schema](#nestedatt--resolved_policy_preview))
 - `status` (String) Virtual key status: active or revoked.
 - `token_prefix` (String) Non-secret prefix of the issued virtual key, safe to log.
 - `token_type` (String) Token type, e.g. Bearer.
@@ -73,6 +73,7 @@ Read-Only:
 
 - `allowed_tool_names` (List of String)
 - `allowed_tool_servers` (List of String)
+- `baseline_policy_id` (String)
 - `denied_tool_names` (List of String)
 - `denied_tool_servers` (List of String)
 - `effective_daily_budget_usd` (Number)
@@ -80,5 +81,7 @@ Read-Only:
 - `effective_request_rate_limit_per_minute` (Number)
 - `effective_token_rate_limit_per_minute` (Number)
 - `matched` (Boolean)
+- `org_daily_budget_usd` (Number)
+- `org_monthly_budget_usd` (Number)
 - `policy_id` (String)
 - `policy_mode` (String)

@@ -10,13 +10,12 @@ The **Cloptima Terraform Provider** enables platform engineering, FinOps, and se
 
 ## Core Capabilities
 
-- **Multi-Provider Routing & BYOK**: Connect OpenAI, Anthropic, Google Vertex AI, Azure OpenAI, and other LLM providers using your own provider credentials.
+- **Multi-Provider Routing & BYOK**: Connect OpenAI, Anthropic, Google Vertex AI, Microsoft Foundry, and other LLM providers using your own provider credentials.
 - **Governance Policies**: Enforce request and token rate limits, daily and monthly spend budgets, per-request token and tool-call ceilings, and model allow/deny lists.
 - **Response Caching**: Reduce latency and provider cost with exact-match and semantic caching.
-- **Safety & Privacy Guardrails**: Detect prompt injection, jailbreaks, toxicity, PII, and secrets, and observe, redact, or block violations.
+- **Safety & Privacy Guardrails**: Detect secrets and sensitive patterns with deterministic rules, redact or block violations, and integrate external guardrail providers.
 - **Model Context Protocol (MCP) Governance**: Authorize and audit tool execution across internal and third-party MCP tool servers.
 - **Edge Gateways**: Run the gateway in your own VPC or Kubernetes cluster, governed by the same policies.
-- **PromptOps**: Version prompt templates, control version activation, and capture evaluation datasets.
 - **FinOps & Unit Economics**: Connect AI inference spend directly to core business metrics (cost per user, cost per order, cost per workflow).
 
 ## Example Usage
@@ -61,6 +60,16 @@ resource "cloptima_llm_provider_credential" "openai_prod" {
   api_key       = var.openai_api_key
 }
 
+resource "cloptima_llm_guardrail_profile" "redact_sensitive" {
+  name = "Redact secrets and US personal data"
+  definition = jsonencode({
+    protect = [
+      { template = "secrets", action = "redact" },
+      { template = "us_personal_data", action = "redact" },
+    ]
+  })
+}
+
 # 2. Establish AI Gateway Governance Policy
 resource "cloptima_llm_gateway_policy" "prod_policy" {
   name = "production-gateway-policy"
@@ -88,17 +97,8 @@ resource "cloptima_llm_gateway_policy" "prod_policy" {
     "openai/gpt-4o-mini"
   ]
 
-  # Active guardrails
-  guardrail_detectors_enabled = [
-    "prompt_injection",
-    "jailbreak",
-    "toxicity",
-    "pii",
-    "secret"
-  ]
-  guardrail_output_action              = "block"
-  guardrail_cost_mode                  = "enforce"
-  guardrail_max_cost_per_request_cents = 10
+  # Guardrails: supplement the organization baseline profile
+  guardrail_profile_id = cloptima_llm_guardrail_profile.redact_sensitive.id
 }
 
 # 3. Bind Policy to Target Environment and App

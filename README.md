@@ -3,7 +3,7 @@
 [![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-cloptima%2Fcloptima-blue.svg)](https://registry.terraform.io/providers/cloptima/cloptima/latest)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-The **Cloptima Terraform Provider** enables platform engineering, security, and FinOps teams to manage AI gateway infrastructure as code. Define LLM routing, exact and semantic caching, real-time safety guardrails, MCP tool servers, VPC edge instances, PromptOps release gates, and unit economics cost attribution declaratively using Terraform.
+The **Cloptima Terraform Provider** enables platform engineering, security, and FinOps teams to manage AI gateway infrastructure as code. Define LLM routing, exact and semantic caching, real-time safety guardrails, MCP tool servers, VPC edge instances, and unit economics cost attribution declaratively using Terraform.
 
 ---
 
@@ -47,6 +47,16 @@ resource "cloptima_llm_provider_credential" "openai_prod" {
   api_key       = var.openai_api_key
 }
 
+resource "cloptima_llm_guardrail_profile" "redact_sensitive" {
+  name = "Redact secrets and US personal data"
+  definition = jsonencode({
+    protect = [
+      { template = "secrets", action = "redact" },
+      { template = "us_personal_data", action = "redact" },
+    ]
+  })
+}
+
 # 2. Establish AI Gateway Governance Policy
 resource "cloptima_llm_gateway_policy" "prod_policy" {
   name = "production-gateway-policy"
@@ -74,17 +84,8 @@ resource "cloptima_llm_gateway_policy" "prod_policy" {
     "openai/gpt-4o-mini"
   ]
 
-  # Active guardrails
-  guardrail_detectors_enabled = [
-    "prompt_injection",
-    "jailbreak",
-    "toxicity",
-    "pii",
-    "secret"
-  ]
-  guardrail_output_action              = "block"
-  guardrail_cost_mode                  = "enforce"
-  guardrail_max_cost_per_request_cents = 10
+  # Guardrails: supplement the organization baseline profile
+  guardrail_profile_id = cloptima_llm_guardrail_profile.redact_sensitive.id
 }
 
 # 3. Bind Policy to Target Environment and App
@@ -123,14 +124,12 @@ output "copilot_virtual_key_token" {
 |---|---|
 | [`cloptima_llm_gateway_policy`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_gateway_policy) | Governance policies (rate limits, caching, budgets, safety guardrails, model routing). |
 | [`cloptima_llm_gateway_policy_binding`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_gateway_policy_binding) | Binds policies to team, application, environment, actor, or principal scopes. |
+| [`cloptima_llm_guardrail_profile`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_guardrail_profile) | Reusable, versioned guardrail profiles: sensitive data templates and custom rules that redact or block, and content safety. |
 | [`cloptima_llm_provider_credential`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_provider_credential) | Manages BYOK provider credentials (OpenAI, Anthropic, Azure, Google, etc.). |
 | [`cloptima_llm_virtual_key`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_virtual_key) | Issues application-scoped virtual keys for inference authentication and attribution. |
 | [`cloptima_llm_gateway_tool_server`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_gateway_tool_server) | Integrates and governs Model Context Protocol (MCP) tool servers. |
 | [`cloptima_llm_edge_instance`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_edge_instance) | Registers edge gateway instances that run in your own VPC or Kubernetes cluster. |
 | [`cloptima_telemetry_key`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/telemetry_key) | Issues telemetry keys for sending LLM usage telemetry to Cloptima. |
-| [`cloptima_llm_prompt_template`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_prompt_template) | Manages version-controlled prompt templates for workloads and agents. |
-| [`cloptima_llm_prompt_version`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_prompt_version) | Creates immutable prompt versions and optionally activates them. |
-| [`cloptima_llm_dataset`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_dataset) | Manages prompt evaluation datasets, including golden datasets. |
 | [`cloptima_llm_unit_economics_denominator`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_unit_economics_denominator) | Configures business metric denominators for FinOps cost-per-unit tracking. |
 
 ### Data Sources
@@ -148,7 +147,6 @@ output "copilot_virtual_key_token" {
 
 - [Getting Started with AI Gateway Governance](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/guides/getting-started)
 - [Deploying Customer-VPC Edge Gateways](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/guides/edge-gateway-setup)
-- [PromptOps: Prompt Versioning & Evaluation Datasets](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/guides/promptops-workflows)
 - [FinOps & LLM Unit Economics](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/guides/finops-unit-economics)
 
 ---

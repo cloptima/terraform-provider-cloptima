@@ -11,7 +11,7 @@ This guide walks through configuring the Cloptima Terraform Provider to manage A
 
 ## Architecture Overview
 
-Cloptima acts as a gateway between your application workloads and AI providers (such as OpenAI, Anthropic, Google Vertex AI, or Azure OpenAI).
+Cloptima acts as a gateway between your application workloads and AI providers (such as OpenAI, Anthropic, Google Vertex AI, or Microsoft Foundry).
 
 Every inference request is authenticated with a **Virtual Key** and governed by the **Gateway Policy** bound to that key's scope. The `team_id`, `app_id`, and `environment` set on the virtual key are authoritative and cannot be overridden by request headers:
 
@@ -23,7 +23,7 @@ App Workload (Virtual Key)
    ├── Rate Limits (requests / tokens per minute)
    ├── Spend Budgets (daily / monthly)
    ├── Response Caching
-   ├── Guardrails (PII, secrets, toxicity, prompt injection)
+   ├── Guardrails (sensitive data templates and rules, content safety)
    └── Model Access & Routing
         │
         ▼
@@ -85,6 +85,16 @@ resource "cloptima_llm_provider_credential" "openai_prod" {
 Define spend controls, caching behaviors, and safety guardrails in a `cloptima_llm_gateway_policy`. Policies default to `observe` mode, which records decisions without blocking; set `mode = "enforce"` to apply limits and guardrails:
 
 ```terraform
+resource "cloptima_llm_guardrail_profile" "redact_sensitive" {
+  name = "Redact secrets and US personal data"
+  definition = jsonencode({
+    protect = [
+      { template = "secrets", action = "redact" },
+      { template = "us_personal_data", action = "redact" },
+    ]
+  })
+}
+
 resource "cloptima_llm_gateway_policy" "standard_prod" {
   name = "standard-production-policy"
   mode = "enforce"
@@ -107,17 +117,8 @@ resource "cloptima_llm_gateway_policy" "standard_prod" {
     "openai/gpt-4o-mini"
   ]
 
-  # Real-time safety guardrails
-  guardrail_detectors_enabled = [
-    "prompt_injection",
-    "jailbreak",
-    "toxicity",
-    "pii",
-    "secret"
-  ]
-  guardrail_output_action              = "block"
-  guardrail_cost_mode                  = "enforce"
-  guardrail_max_cost_per_request_cents = 10
+  # Guardrails: supplement the organization baseline profile
+  guardrail_profile_id = cloptima_llm_guardrail_profile.redact_sensitive.id
 }
 ```
 

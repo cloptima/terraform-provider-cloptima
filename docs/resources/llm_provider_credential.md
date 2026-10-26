@@ -3,12 +3,12 @@
 page_title: "cloptima_llm_provider_credential Resource - cloptima"
 subcategory: ""
 description: |-
-  A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; api_key and api_base can be rotated in place.
+  A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; api_key, api_base, and deployment_type are updated in place by a rotate.
 ---
 
 # cloptima_llm_provider_credential (Resource)
 
-A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; api_key and api_base can be rotated in place.
+A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; api_key, api_base, and deployment_type are updated in place by a rotate.
 
 ## Example Usage
 
@@ -20,12 +20,15 @@ resource "cloptima_llm_provider_credential" "anthropic_primary" {
   api_key       = var.anthropic_api_key
 }
 
-# Azure OpenAI / custom deployment credential with API base
-resource "cloptima_llm_provider_credential" "azure_openai" {
-  display_name  = "Azure OpenAI EastUS"
-  provider_name = "azure"
-  api_key       = var.azure_openai_key
-  api_base      = "https://my-company.openai.azure.com"
+# Microsoft Foundry credential with the resource endpoint as API base.
+# deployment_type defaults to Global Standard. Data Zone and Regional
+# deployments can cost more; Cloptima prices requests by this value.
+resource "cloptima_llm_provider_credential" "azure_foundry" {
+  display_name    = "Microsoft Foundry EastUS"
+  provider_name   = "azure"
+  api_key         = var.azure_foundry_key
+  api_base        = "https://my-company.services.ai.azure.com"
+  deployment_type = "data_zone"
 }
 ```
 
@@ -42,6 +45,7 @@ resource "cloptima_llm_provider_credential" "azure_openai" {
 - `api_base` (String) Custom provider API base URL, if applicable. Changing this value triggers a rotate alongside api_key.
 - `api_key` (String, Sensitive) Provider API key. Required for standard BYOK providers. Changing this value triggers a rotate, not a replace.
 - `api_version` (String) Provider API version, if applicable.
+- `deployment_type` (String) Microsoft Foundry deployment type, for provider_name azure only: global_standard, data_zone, or regional. Omit it for Global Standard. Data Zone and Regional deployments can cost more than Global Standard, and Cloptima prices each request at the catalog price for this deployment type. Changing this value triggers a rotate alongside api_key.
 - `project_id` (String) Provider project ID, if applicable.
 - `refresh_token` (String, Sensitive) OAuth refresh token for providers that use OAuth refresh credentials instead of an API key. Sent to Cloptima at creation and retained in Terraform state, but never returned by Cloptima. Changing this value forces replacement.
 - `region` (String) Provider region, if applicable.
