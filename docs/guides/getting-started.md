@@ -87,12 +87,12 @@ Define spend controls, caching behaviors, and safety guardrails in a `cloptima_l
 ```terraform
 resource "cloptima_llm_guardrail_profile" "redact_sensitive" {
   name = "Redact secrets and US personal data"
-  definition = jsonencode({
+  definition = {
     protect = [
       { template = "secrets", action = "redact" },
       { template = "us_personal_data", action = "redact" },
     ]
-  })
+  }
 }
 
 resource "cloptima_llm_gateway_policy" "standard_prod" {

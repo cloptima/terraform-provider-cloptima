@@ -49,39 +49,16 @@ output "copilot_virtual_key_token" {
 - `default_credential_ids` (String) Per-provider default credential IDs as a JSON object.
 - `environment` (String) Authoritative environment attribution for requests made with this virtual key.
 - `expires_in_days` (Number) Virtual key lifetime in days from creation. Changing this value replaces the virtual key (a new secret is minted) rather than updating it in place.
-- `membership_id` (String) Membership ID this virtual key is issued under. Defaults to the calling identity's own membership when omitted. Immutable after creation.
 - `team_id` (String) Authoritative team attribution for requests made with this virtual key.
 
 ### Read-Only
 
 - `access_token` (String, Sensitive) The raw virtual key value. Returned only once at creation and retained only in Terraform state.
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `env_var` (String) Suggested environment variable name for this virtual key.
 - `expires_at` (String) Expiry timestamp, if any.
 - `id` (String) Virtual key ID.
-- `masked_access_token` (String) A masked/displayable form of the virtual key value.
-- `resolved_policy_preview` (Attributes) The gateway policy this virtual key resolved to at issue time, given its team/app/environment scope - the same governance preview a console admin would see. Values are effective: the winning policy with the organization baseline applied. effective_daily_budget_usd and effective_monthly_budget_usd are the winning policy's own budgets; org_daily_budget_usd and org_monthly_budget_usd are the baseline's ceiling on all gateway spend. Set only at creation; not refreshed on subsequent reads. (see [below for nested schema](#nestedatt--resolved_policy_preview))
+- `membership_id` (String) Membership this virtual key belongs to: the membership of the personal access token Terraform runs with.
 - `status` (String) Virtual key status: active or revoked.
 - `token_prefix` (String) Non-secret prefix of the issued virtual key, safe to log.
 - `token_type` (String) Token type, e.g. Bearer.
-
-<a id="nestedatt--resolved_policy_preview"></a>
-### Nested Schema for `resolved_policy_preview`
-
-Read-Only:
-
-- `allowed_tool_names` (List of String)
-- `allowed_tool_servers` (List of String)
-- `baseline_policy_id` (String)
-- `denied_tool_names` (List of String)
-- `denied_tool_servers` (List of String)
-- `effective_daily_budget_usd` (Number)
-- `effective_monthly_budget_usd` (Number)
-- `effective_request_rate_limit_per_minute` (Number)
-- `effective_token_rate_limit_per_minute` (Number)
-- `matched` (Boolean)
-- `org_daily_budget_usd` (Number)
-- `org_monthly_budget_usd` (Number)
-- `policy_id` (String)
-- `policy_mode` (String)

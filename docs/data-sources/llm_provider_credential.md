@@ -39,7 +39,6 @@ output "anthropic_credential_id" {
 - `created_at` (String) Creation timestamp.
 - `credential_location` (String) Credential location: cloud or edge.
 - `credential_mode` (String) Credential mode: api_key or oauth_refresh.
-- `customer_id` (String) Owning customer ID.
 - `project_id` (String) Cloud project ID.
 - `region` (String) Cloud region.
 - `status` (String) Validation status: active, pending, degraded, or revoked.

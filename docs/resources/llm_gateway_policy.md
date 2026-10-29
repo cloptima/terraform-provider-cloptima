@@ -15,12 +15,12 @@ A Cloptima managed LLM gateway governance policy: model/provider allow-deny list
 ```terraform
 resource "cloptima_llm_guardrail_profile" "redact_sensitive" {
   name = "Redact secrets and US personal data"
-  definition = jsonencode({
+  definition = {
     protect = [
       { template = "secrets", action = "redact" },
       { template = "us_personal_data", action = "redact" },
     ]
-  })
+  }
 }
 
 resource "cloptima_llm_gateway_policy" "production" {
@@ -114,11 +114,11 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 - `max_retry_count` (Number) Ceiling on upstream retries per request.
 - `max_tool_calls` (Number) Ceiling on tool calls per request.
 - `max_video_duration_seconds` (Number) Ceiling on output video duration in seconds.
-- `metadata` (String) Optional JSON metadata for customer-defined labels and context. Configure routing through this resource's routing_* attributes.
 - `mode` (String) Enforcement mode: observe or enforce. While the effective mode is observe, the policy and its guardrail profile record what they would block or redact without doing it. An enforcing organization baseline policy makes the effective mode enforce, and the organization baseline guardrail profile always enforces.
 - `monthly_budget_usd` (Number) Monthly spend ceiling in USD (UTC month). On the organization baseline, the ceiling on all gateway spend in the organization.
 - `prompt_retention_mode` (String) Prompt/response retention mode for audit logging: none, metadata_only, tool_io, or full.
 - `request_rate_limit_per_minute` (Number) Requests-per-minute ceiling.
+- `required_metadata_keys` (List of String) Request metadata keys, such as team_id or app_id, that every request this policy governs must carry. At most 20 keys.
 - `routing_backoff` (String) Backoff strategy between retries on the same route: none or exponential_jitter.
 - `routing_backoff_initial_ms` (Number) Initial backoff delay in milliseconds. When only one of the initial and maximum backoff is set, the other follows it.
 - `routing_backoff_max_ms` (Number) Maximum backoff delay in milliseconds, up to 5000.
@@ -145,7 +145,6 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 ### Read-Only
 
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `exact_cache_allowed_routes` (List of String) Routes eligible for exact caching. Determined by Cloptima and not directly configurable.
 - `id` (String) Policy ID.
 - `semantic_cache_allowed_routes` (List of String) Routes eligible for semantic caching. Determined by Cloptima and not directly configurable.

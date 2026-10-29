@@ -46,7 +46,7 @@ resource "cloptima_llm_unit_economics_denominator" "completed_order" {
 ### Optional
 
 - `default_granularity` (String) Default reporting granularity: daily, weekly, or monthly. Defaults to daily.
-- `default_group_by` (String) Default dimension to group unit economics reports by (e.g. app_id, team_id, model). Defaults to app_id.
+- `default_group_by` (String) Default dimension to group unit economics reports by (e.g. app_id, team_id, product). Defaults to app_id.
 - `description` (String) How this unit maps to customer value, up to 1024 characters.
 - `is_default` (Boolean) Whether this is the organization's default unit. Defaults to false.
 - `metadata` (String) Optional metadata, as a JSON object.
@@ -54,7 +54,6 @@ resource "cloptima_llm_unit_economics_denominator" "completed_order" {
 ### Read-Only
 
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `id` (String) Denominator setting ID.
 - `observed` (Boolean) Whether usage has been reported for this unit type.
 - `updated_at` (String) Last update timestamp.

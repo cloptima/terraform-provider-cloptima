@@ -46,6 +46,5 @@ resource "cloptima_llm_gateway_policy_binding" "analytics_prod" {
 ### Read-Only
 
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `id` (String) Binding ID.
 - `updated_at` (String) Last update timestamp.

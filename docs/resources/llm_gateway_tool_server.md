@@ -50,7 +50,6 @@ resource "cloptima_llm_gateway_tool_server" "internal_mcp" {
 ### Read-Only
 
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `effective_status` (String) Current effective status. May be "disabled" while activation approval is pending; see pending_approval_id.
 - `id` (String) Tool server ID.
 - `pending_approval_id` (String) Set when this server's requested status is queued behind an approval.

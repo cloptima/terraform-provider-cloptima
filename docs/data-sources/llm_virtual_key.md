@@ -35,12 +35,11 @@ output "virtual_key_status" {
 
 - `app_id` (String) Bound application ID.
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `default_credential_id` (String) Default provider credential ID.
 - `default_credential_ids` (String) Per-provider default credential IDs JSON map.
 - `environment` (String) Bound environment.
 - `expires_at` (String) Expiry timestamp.
-- `membership_id` (String) Membership ID this virtual key is issued under.
+- `membership_id` (String) Membership this virtual key belongs to.
 - `status` (String) Virtual key status: active, revoked, or expired.
 - `team_id` (String) Bound team ID.
 - `token_prefix` (String) Non-secret prefix of the virtual key.

@@ -35,7 +35,6 @@ output "tool_server_url" {
 
 - `allowed_tool_names` (List of String) Allowed tool names on this server.
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `denied_tool_names` (List of String) Denied tool names on this server.
 - `pending_approval_id` (String) Pending approval ID if activation is queued.
 - `server_type` (String) Tool server type (e.g. mcp, openapi, function, custom).

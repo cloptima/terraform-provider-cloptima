@@ -32,7 +32,7 @@ output "growth_prod_policy" {
 output "growth_prod_org_daily_ceiling" {
   value = one([
     for setting in data.cloptima_llm_gateway_effective_policy.growth_prod.settings :
-    jsondecode(setting.value) if setting.field == "orgDailyBudgetUsd"
+    jsondecode(setting.value) if setting.field == "org_daily_budget_usd"
   ])
 }
 ```
@@ -56,7 +56,7 @@ output "growth_prod_org_daily_ceiling" {
 - `policy_id` (String) ID of the winning policy.
 - `policy_name` (String) Name of the winning policy.
 - `reason` (String) Why no policy matched, when matched is false.
-- `settings` (Attributes List) Each setting the organization baseline can also set, with its effective value and its source: winner, baseline, both, or unset. Allow lists report both sides, since a request must pass each. dailyBudgetUsd and monthlyBudgetUsd are the winning policy's own budgets; orgDailyBudgetUsd and orgMonthlyBudgetUsd are the baseline's ceiling on all gateway spend. (see [below for nested schema](#nestedatt--settings))
+- `settings` (Attributes List) Each setting the organization baseline can also set, with its effective value and its source: winner, baseline, both, or unset. Allow lists report both sides, since a request must pass each. daily_budget_usd and monthly_budget_usd are the winning policy's own budgets; org_daily_budget_usd and org_monthly_budget_usd are the baseline's ceiling on all gateway spend. (see [below for nested schema](#nestedatt--settings))
 
 <a id="nestedatt--settings"></a>
 ### Nested Schema for `settings`

@@ -55,7 +55,6 @@ resource "cloptima_llm_provider_credential" "azure_foundry" {
 - `created_at` (String) Creation timestamp.
 - `credential_location` (String) Credential location: cloud or edge.
 - `credential_mode` (String) Credential mode, e.g. byok.
-- `customer_id` (String) Owning customer ID.
 - `id` (String) Credential ID.
 - `status` (String) Validation status.
 - `updated_at` (String) Last update timestamp.

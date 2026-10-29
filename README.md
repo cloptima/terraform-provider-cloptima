@@ -49,12 +49,12 @@ resource "cloptima_llm_provider_credential" "openai_prod" {
 
 resource "cloptima_llm_guardrail_profile" "redact_sensitive" {
   name = "Redact secrets and US personal data"
-  definition = jsonencode({
+  definition = {
     protect = [
       { template = "secrets", action = "redact" },
       { template = "us_personal_data", action = "redact" },
     ]
-  })
+  }
 }
 
 # 2. Establish AI Gateway Governance Policy

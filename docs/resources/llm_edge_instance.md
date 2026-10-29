@@ -45,13 +45,12 @@ output "edge_instance_bootstrap_pat" {
 - `deployment_type` (String) Deployment type: kubernetes, docker_compose, ecs, vm, local, or other. Defaults to kubernetes.
 - `environment` (String) Environment: dev, staging, prod, or sandbox. Defaults to prod.
 - `lease_duration_seconds` (Number) Lease duration in seconds, from 3600 (1 hour) to 2592000 (30 days). Defaults to 1209600 (14 days).
-- `metadata` (String) Optional metadata for the edge instance, as a JSON object.
+- `metadata` (String) Optional labels for the edge instance, as a JSON object of string, number, or boolean values.
 - `region` (String) Region where this edge instance runs.
 
 ### Read-Only
 
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `edge_pat` (String, Sensitive) Edge PAT the edge gateway uses to authenticate with Cloptima. Available only in the state of the apply that created the instance; it is not recovered on import.
 - `id` (String) Edge instance ID.
 - `lease_expires_at` (String) Timestamp when the current lease expires.

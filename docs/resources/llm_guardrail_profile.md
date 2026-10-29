@@ -17,7 +17,7 @@ resource "cloptima_llm_guardrail_profile" "protect_customer_data" {
   name        = "Protect customer data"
   description = "Redacts credentials and US personal data from requests, blocks internal project names, and checks requests and responses for harmful content"
 
-  definition = jsonencode({
+  definition = {
     protect = [
       { template = "secrets", action = "redact" },
       { template = "us_personal_data", action = "redact" },
@@ -25,7 +25,7 @@ resource "cloptima_llm_guardrail_profile" "protect_customer_data" {
       { rule = "employee_id", match = { label = "(?i:employee id|badge)", value = "E\\d{6}" }, action = "redact" },
     ]
     content_safety = { kind = "cloptima_managed" }
-  })
+  }
 }
 ```
 
@@ -34,7 +34,7 @@ resource "cloptima_llm_guardrail_profile" "protect_customer_data" {
 
 ### Required
 
-- `definition` (String) Profile definition as a JSON object: {protect, content_safety}. protect lists what each request is checked for, each entry with an action (redact, the default, or block): a Cloptima template ({template, version}) or a custom rule ({rule, match}). The template ids are secrets, code_secrets, us_personal_data, eu_personal_data, uk_personal_data, canada_personal_data, india_personal_data, australia_personal_data, financial_ids, us_financial, us_healthcare, and infrastructure. A custom rule's id is 1 to 48 lowercase letters, digits, and underscores, starting with a letter or digit, and it matches terms (match.terms, whole words in any letter case), an RE2 regex (match.regex), or a labeled value (match.label with match.value). A template without a version binds the latest, and the profile keeps that version until the configuration names a newer one; a new profile accepts only the latest version, so leave version unset unless you are upgrading an existing profile. content_safety checks requests and responses for harmful content and blocks it: {kind: cloptima_managed}, or the organization's own {kind: azure_content_safety, credential_id, endpoint}, {kind: bedrock_guardrails, credential_id, region, guardrail_id, guardrail_version}, {kind: google_model_armor, credential_id, template_name}, or {kind: webhook, url, credential_id (optional), auth_header (optional, with credential_id)}.
+- `definition` (Attributes) What the profile checks: protect, and an optional content_safety check. (see [below for nested schema](#nestedatt--definition))
 - `name` (String) Profile name, unique per organization.
 
 ### Optional
@@ -45,8 +45,62 @@ resource "cloptima_llm_guardrail_profile" "protect_customer_data" {
 ### Read-Only
 
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `id` (String) Guardrail profile ID.
-- `published_definition` (String) Definition of the enforced version, with defaults filled in.
+- `published_definition` (String) Definition of the enforced version as JSON, with each template's version and rules filled in.
 - `published_version` (Number) Version the gateway enforces.
 - `updated_at` (String) Last update timestamp.
+
+<a id="nestedatt--definition"></a>
+### Nested Schema for `definition`
+
+Required:
+
+- `protect` (Attributes List) What each request is checked for, at most 64 entries. An entry is a Cloptima template (template, with an optional version) or a custom rule (rule with match), and its action. (see [below for nested schema](#nestedatt--definition--protect))
+
+Optional:
+
+- `content_safety` (Attributes) Checks requests and responses for harmful content and blocks it. Set kind and only the fields that kind takes: cloptima_managed takes none; the organization's own azure_content_safety takes credential_id and endpoint, bedrock_guardrails takes credential_id, region, guardrail_id, and guardrail_version, google_model_armor takes credential_id and template_name, and webhook takes url, credential_id (optional), and auth_header (optional, with credential_id). (see [below for nested schema](#nestedatt--definition--content_safety))
+
+<a id="nestedatt--definition--protect"></a>
+### Nested Schema for `definition.protect`
+
+Required:
+
+- `action` (String) What happens to a match: redact or block.
+
+Optional:
+
+- `match` (Attributes) What a custom rule matches. Set exactly one of terms, regex, or label with value. (see [below for nested schema](#nestedatt--definition--protect--match))
+- `rule` (String) A custom rule id: 1 to 48 lowercase letters, digits, and underscores, starting with a letter or digit.
+- `template` (String) A Cloptima template id: secrets, code_secrets, us_personal_data, eu_personal_data, uk_personal_data, canada_personal_data, india_personal_data, australia_personal_data, financial_ids, us_financial, us_healthcare, or infrastructure.
+- `version` (Number) The template version. A template without a version binds the latest, and the profile keeps that version until the configuration names a newer one. A new profile accepts only the latest version, so leave version unset unless you are upgrading an existing profile.
+
+<a id="nestedatt--definition--protect--match"></a>
+### Nested Schema for `definition.protect.match`
+
+Optional:
+
+- `label` (String) An RE2 regular expression for the label before a value, such as (?i:employee id). Set it with value.
+- `regex` (String) One RE2 regular expression, at most 128 characters.
+- `terms` (List of String) Literal terms, matched as whole words in any letter case. At most 10 terms of 1 to 64 characters.
+- `value` (String) An RE2 regular expression for the value, on the label's line or alone on the next line. Set it with label.
+
+
+
+<a id="nestedatt--definition--content_safety"></a>
+### Nested Schema for `definition.content_safety`
+
+Required:
+
+- `kind` (String) cloptima_managed, azure_content_safety, bedrock_guardrails, google_model_armor, or webhook.
+
+Optional:
+
+- `auth_header` (String) The header the webhook credential is sent in. Defaults to Authorization.
+- `credential_id` (String) The provider credential ID the check authenticates with.
+- `endpoint` (String) The Azure AI Content Safety endpoint.
+- `guardrail_id` (String) The Bedrock guardrail ID.
+- `guardrail_version` (String) The Bedrock guardrail version: DRAFT or a version number.
+- `region` (String) The AWS region of the Bedrock guardrail.
+- `template_name` (String) The Model Armor template, as projects/PROJECT/locations/LOCATION/templates/TEMPLATE.
+- `url` (String) The webhook URL.

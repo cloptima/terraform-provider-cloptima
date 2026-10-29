@@ -39,7 +39,6 @@ output "policy_allowed_models" {
 - `allowed_tool_servers` (List of String) Allowed tool server names.
 - `budget_mode` (String) Budget enforcement mode: observe, soft, or hard.
 - `created_at` (String) Creation timestamp.
-- `customer_id` (String) Owning customer ID.
 - `daily_budget_usd` (Number) Daily spend ceiling in USD.
 - `denied_models` (List of String) Denied canonical model names.
 - `denied_tool_names` (List of String) Denied tool names across all tool servers.
