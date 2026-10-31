@@ -3,32 +3,47 @@
 page_title: "cloptima_llm_provider_credential Resource - cloptima"
 subcategory: ""
 description: |-
-  A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; api_key, api_base, and deployment_type are updated in place by a rotate.
+  A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; secret, api_base, and deployment_type are updated in place by a rotate.
 ---
 
 # cloptima_llm_provider_credential (Resource)
 
-A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; api_key, api_base, and deployment_type are updated in place by a rotate.
+A BYOK provider credential stored securely by Cloptima. Changing provider_name, display_name, api_version, region, or project_id replaces the resource; secret, api_base, and deployment_type are updated in place by a rotate.
 
 ## Example Usage
 
 ```terraform
-# BYOK credential with API key
+# BYOK credential with an API key
 resource "cloptima_llm_provider_credential" "anthropic_primary" {
   display_name  = "Anthropic Primary Production"
   provider_name = "anthropic"
-  api_key       = var.anthropic_api_key
+  secret = {
+    api_key = var.anthropic_api_key
+  }
 }
 
-# Microsoft Foundry credential with the resource endpoint as API base.
+# Microsoft Foundry credential with the resource endpoint as api_base.
 # deployment_type defaults to Global Standard. Data Zone and Regional
 # deployments can cost more; Cloptima prices requests by this value.
 resource "cloptima_llm_provider_credential" "azure_foundry" {
   display_name    = "Microsoft Foundry EastUS"
   provider_name   = "azure"
-  api_key         = var.azure_foundry_key
   api_base        = "https://my-company.services.ai.azure.com"
   deployment_type = "data_zone"
+  secret = {
+    api_key = var.azure_foundry_key
+  }
+}
+
+# Amazon Bedrock credential with an AWS access key pair.
+resource "cloptima_llm_provider_credential" "bedrock" {
+  display_name  = "Bedrock us-east-1"
+  provider_name = "bedrock"
+  region        = "us-east-1"
+  secret = {
+    access_key_id     = var.aws_access_key_id
+    secret_access_key = var.aws_secret_access_key
+  }
 }
 ```
 
@@ -42,13 +57,13 @@ resource "cloptima_llm_provider_credential" "azure_foundry" {
 
 ### Optional
 
-- `api_base` (String) Custom provider API base URL, if applicable. Changing this value triggers a rotate alongside api_key.
-- `api_key` (String, Sensitive) Provider API key. Required for standard BYOK providers. Changing this value triggers a rotate, not a replace.
+- `api_base` (String) Provider endpoint URL, for a provider that takes one: azure, azure_content_safety, or custom. It never holds a secret; put secret values in secret. Changing this value triggers a rotate alongside secret.
 - `api_version` (String) Provider API version, if applicable.
-- `deployment_type` (String) Microsoft Foundry deployment type, for provider_name azure only: global_standard, data_zone, or regional. Omit it for Global Standard. Data Zone and Regional deployments can cost more than Global Standard, and Cloptima prices each request at the catalog price for this deployment type. Changing this value triggers a rotate alongside api_key.
+- `deployment_type` (String) Microsoft Foundry deployment type, for provider_name azure only: global_standard, data_zone, or regional. Omit it for Global Standard. Data Zone and Regional deployments can cost more than Global Standard, and Cloptima prices each request at the catalog price for this deployment type. Changing this value triggers a rotate alongside secret.
 - `project_id` (String) Provider project ID, if applicable.
-- `refresh_token` (String, Sensitive) OAuth refresh token for providers that use OAuth refresh credentials instead of an API key. Sent to Cloptima at creation and retained in Terraform state, but never returned by Cloptima. Changing this value forces replacement.
+- `refresh_token` (String, Sensitive) OAuth refresh token, for provider_name openai_codex only. Set it instead of secret. Sent to Cloptima at creation and retained in Terraform state, but never returned by Cloptima. Changing this value forces replacement.
 - `region` (String) Provider region, if applicable.
+- `secret` (Map of String, Sensitive) The provider's secret values, by field name: api_key for most providers, access_key_id and secret_access_key for bedrock, and service_account_json for vertex_ai. Set either secret or refresh_token. A blank value is refused. Retained in Terraform state, but never returned by Cloptima. Changing this value triggers a rotate that replaces the whole secret, not a replace.
 
 ### Read-Only
 

@@ -68,13 +68,17 @@ Register your organization's provider API keys. Cloptima stores them securely an
 resource "cloptima_llm_provider_credential" "anthropic_prod" {
   display_name  = "Anthropic Production BYOK"
   provider_name = "anthropic"
-  api_key       = var.anthropic_api_key
+  secret = {
+    api_key = var.anthropic_api_key
+  }
 }
 
 resource "cloptima_llm_provider_credential" "openai_prod" {
   display_name  = "OpenAI Production BYOK"
   provider_name = "openai"
-  api_key       = var.openai_api_key
+  secret = {
+    api_key = var.openai_api_key
+  }
 }
 ```
 
@@ -146,12 +150,12 @@ Applications authenticate to the gateway using virtual keys. Virtual keys keep p
 
 ```terraform
 resource "cloptima_llm_virtual_key" "copilot" {
-  name                  = "customer-copilot-prod-key"
-  team_id               = "platform-engineering"
-  app_id                = "customer-copilot"
-  environment           = "production"
-  default_credential_id = cloptima_llm_provider_credential.openai_prod.id
-  expires_in_days       = 180
+  name                   = "customer-copilot-prod-key"
+  team_id                = "platform-engineering"
+  app_id                 = "customer-copilot"
+  environment            = "production"
+  default_credential_ids = jsonencode({ openai = cloptima_llm_provider_credential.openai_prod.id })
+  expires_in_days        = 180
 }
 
 # The virtual key value is available only from the apply that creates it

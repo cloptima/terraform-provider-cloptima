@@ -85,7 +85,6 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 - `apply_immediately` (Boolean) When true and the applying identity has the required role, an approval-gated change is approved and takes effect in the same apply. Otherwise, the change follows the standard approval flow. Defaults to false when omitted.
 - `budget_mode` (String) Budget enforcement mode: observe, soft, or hard. Every budget counts spend; only hard blocks, and only when the effective mode is enforce. On the organization baseline, hard blocks all gateway spend at the ceiling whatever the policies' modes are.
 - `daily_budget_usd` (Number) Daily spend ceiling in USD (UTC day). On the organization baseline, the ceiling on all gateway spend in the organization.
-- `default_credential_id` (String) Default BYOK provider credential ID used when a request does not specify one.
 - `default_credential_ids` (String) Per-provider default credential IDs as a JSON object, e.g. {"openai": "cred-id"}.
 - `denied_models` (List of String) Denied canonical model IDs/patterns; deny wins over allow.
 - `denied_tool_names` (List of String) Denied MCP tool names; deny wins over allow.

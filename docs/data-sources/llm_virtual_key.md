@@ -35,7 +35,6 @@ output "virtual_key_status" {
 
 - `app_id` (String) Bound application ID.
 - `created_at` (String) Creation timestamp.
-- `default_credential_id` (String) Default provider credential ID.
 - `default_credential_ids` (String) Per-provider default credential IDs JSON map.
 - `environment` (String) Bound environment.
 - `expires_at` (String) Expiry timestamp.

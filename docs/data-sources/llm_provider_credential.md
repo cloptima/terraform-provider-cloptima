@@ -34,11 +34,11 @@ output "anthropic_credential_id" {
 
 ### Read-Only
 
-- `api_base` (String) Provider API base URL.
+- `api_base` (String) Provider endpoint URL, for a provider that takes one. It never holds a secret.
 - `api_version` (String) Provider API version.
 - `created_at` (String) Creation timestamp.
 - `credential_location` (String) Credential location: cloud or edge.
-- `credential_mode` (String) Credential mode: api_key or oauth_refresh.
+- `credential_mode` (String) Credential mode: byok, oauth_refresh, or edge_local.
 - `project_id` (String) Cloud project ID.
 - `region` (String) Cloud region.
 - `status` (String) Validation status: active, pending, degraded, or revoked.

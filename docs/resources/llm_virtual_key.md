@@ -3,12 +3,12 @@
 page_title: "cloptima_llm_virtual_key Resource - cloptima"
 subcategory: ""
 description: |-
-  A Cloptima virtual key: an inference-scoped credential (ai:invoke) used to authenticate LLM gateway requests. team_id/app_id/environment/default_credential_id set here are the authoritative attribution scope for this virtual key at runtime and cannot be overridden by request headers.
+  A Cloptima virtual key: an inference-scoped credential (ai:invoke) used to authenticate LLM gateway requests. team_id/app_id/environment/default_credential_ids set here are the authoritative attribution scope for this virtual key at runtime and cannot be overridden by request headers.
 ---
 
 # cloptima_llm_virtual_key (Resource)
 
-A Cloptima virtual key: an inference-scoped credential (ai:invoke) used to authenticate LLM gateway requests. team_id/app_id/environment/default_credential_id set here are the authoritative attribution scope for this virtual key at runtime and cannot be overridden by request headers.
+A Cloptima virtual key: an inference-scoped credential (ai:invoke) used to authenticate LLM gateway requests. team_id/app_id/environment/default_credential_ids set here are the authoritative attribution scope for this virtual key at runtime and cannot be overridden by request headers.
 
 ## Example Usage
 
@@ -16,16 +16,18 @@ A Cloptima virtual key: an inference-scoped credential (ai:invoke) used to authe
 resource "cloptima_llm_provider_credential" "openai" {
   display_name  = "OpenAI Production"
   provider_name = "openai"
-  api_key       = var.openai_api_key
+  secret = {
+    api_key = var.openai_api_key
+  }
 }
 
 resource "cloptima_llm_virtual_key" "copilot_prod" {
-  name                  = "customer-copilot-prod-key"
-  team_id               = "engineering"
-  app_id                = "customer-copilot"
-  environment           = "production"
-  default_credential_id = cloptima_llm_provider_credential.openai.id
-  expires_in_days       = 180
+  name                   = "customer-copilot-prod-key"
+  team_id                = "engineering"
+  app_id                 = "customer-copilot"
+  environment            = "production"
+  default_credential_ids = jsonencode({ openai = cloptima_llm_provider_credential.openai.id })
+  expires_in_days        = 180
 }
 
 # The virtual key's client bearer token is returned once upon creation:
@@ -45,7 +47,6 @@ output "copilot_virtual_key_token" {
 ### Optional
 
 - `app_id` (String) Authoritative app attribution for requests made with this virtual key.
-- `default_credential_id` (String) Default BYOK credential ID used by this virtual key.
 - `default_credential_ids` (String) Per-provider default credential IDs as a JSON object.
 - `environment` (String) Authoritative environment attribution for requests made with this virtual key.
 - `expires_in_days` (Number) Virtual key lifetime in days from creation. Changing this value replaces the virtual key (a new secret is minted) rather than updating it in place.

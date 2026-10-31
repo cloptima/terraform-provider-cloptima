@@ -57,7 +57,9 @@ provider "cloptima" {}
 resource "cloptima_llm_provider_credential" "openai_prod" {
   display_name  = "OpenAI Production"
   provider_name = "openai"
-  api_key       = var.openai_api_key
+  secret = {
+    api_key = var.openai_api_key
+  }
 }
 
 resource "cloptima_llm_guardrail_profile" "redact_sensitive" {
@@ -112,12 +114,12 @@ resource "cloptima_llm_gateway_policy_binding" "copilot_prod_binding" {
 
 # 4. Issue Developer Virtual Key
 resource "cloptima_llm_virtual_key" "copilot_key" {
-  name                  = "copilot-prod-key"
-  team_id               = "engineering"
-  app_id                = "customer-copilot"
-  environment           = "production"
-  default_credential_id = cloptima_llm_provider_credential.openai_prod.id
-  expires_in_days       = 180
+  name                   = "copilot-prod-key"
+  team_id                = "engineering"
+  app_id                 = "customer-copilot"
+  environment            = "production"
+  default_credential_ids = jsonencode({ openai = cloptima_llm_provider_credential.openai_prod.id })
+  expires_in_days        = 180
 }
 
 output "copilot_virtual_key_token" {
