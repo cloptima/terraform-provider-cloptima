@@ -3,7 +3,7 @@
 [![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-cloptima%2Fcloptima-blue.svg)](https://registry.terraform.io/providers/cloptima/cloptima/latest)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-The **Cloptima Terraform Provider** enables platform engineering, security, and FinOps teams to manage AI gateway infrastructure as code. Define LLM routing, exact and semantic caching, real-time safety guardrails, MCP tool servers, VPC edge instances, and unit economics cost attribution declaratively using Terraform.
+The **Cloptima Terraform Provider** enables platform engineering, security, and FinOps teams to manage AI gateway infrastructure as code. Define LLM gateway policies with backup models, exact and semantic caching, real-time safety guardrails, MCP tool servers, VPC edge instances, and unit economics cost attribution declaratively using Terraform.
 
 ---
 
@@ -124,7 +124,7 @@ output "copilot_virtual_key_token" {
 
 | Resource | Description |
 |---|---|
-| [`cloptima_llm_gateway_policy`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_gateway_policy) | Governance policies (rate limits, caching, budgets, safety guardrails, model routing). |
+| [`cloptima_llm_gateway_policy`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_gateway_policy) | Governance policies (rate limits, caching, budgets, safety guardrails, backup models). |
 | [`cloptima_llm_gateway_policy_binding`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_gateway_policy_binding) | Binds policies to team, application, environment, actor, or principal scopes. |
 | [`cloptima_llm_guardrail_profile`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_guardrail_profile) | Reusable, versioned guardrail profiles: sensitive data templates and custom rules that redact or block, and content safety. |
 | [`cloptima_llm_provider_credential`](https://registry.terraform.io/providers/cloptima/cloptima/latest/docs/resources/llm_provider_credential) | Manages BYOK provider credentials (OpenAI, Anthropic, Azure, Google, etc.). |

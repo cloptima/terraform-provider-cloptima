@@ -47,6 +47,9 @@ resource "cloptima_llm_gateway_policy" "production" {
     "openai/gpt-4o-mini"
   ]
 
+  # Backup models, tried in order when the requested model cannot be served
+  backup_models = ["gpt-4o", "gpt-4o-mini"]
+
   # Guardrails: supplement the organization baseline profile
   guardrail_profile_id = cloptima_llm_guardrail_profile.redact_sensitive.id
 }
@@ -73,7 +76,7 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 
 ### Required
 
-- `name` (String) Policy display name, unique per customer (case-insensitive).
+- `name` (String) Policy display name, 5 to 100 characters, unique per customer (case-insensitive).
 
 ### Optional
 
@@ -83,6 +86,7 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 - `allowed_tool_names` (List of String) Allowed MCP tool names.
 - `allowed_tool_servers` (List of String) Allowed registered tool server names (see cloptima_llm_gateway_tool_server).
 - `apply_immediately` (Boolean) When true and the applying identity has the required role, an approval-gated change is approved and takes effect in the same apply. Otherwise, the change follows the standard approval flow. Defaults to false when omitted.
+- `backup_models` (List of String) Up to two backup models, tried in order when the requested model cannot be served. Each is a provider-neutral model ID from the Cloptima model catalog, such as claude-sonnet-4-5, without a provider prefix or wildcard. Set to an empty list for none. The organization baseline has no backup models.
 - `budget_mode` (String) Budget enforcement mode: observe, soft, or hard. Every budget counts spend; only hard blocks, and only when the effective mode is enforce. On the organization baseline, hard blocks all gateway spend at the ceiling whatever the policies' modes are.
 - `daily_budget_usd` (Number) Daily spend ceiling in USD (UTC day). On the organization baseline, the ceiling on all gateway spend in the organization.
 - `default_credential_ids` (String) Per-provider default credential IDs as a JSON object, e.g. {"openai": "cred-id"}.
@@ -92,18 +96,9 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 - `edge_offline_keep_serving` (Boolean) Whether an edge gateway that loses contact with Cloptima keeps serving requests governed by this policy. Requests continue for up to 24 hours. Spend is counted on the edge and applied to your budgets when it reconnects, so a budget can be exceeded during an outage. When false, an edge that has lost contact serves only within the budget share it already holds. On the organization baseline, false applies to every policy. Defaults to true.
 - `embedding_credential_id` (String) BYOK provider credential ID used for generating semantic cache embeddings; required when embedding_credential_mode is cloud_byok or edge_local_byok, and must be empty for managed_credits.
 - `embedding_credential_mode` (String) Credential mode for semantic cache embeddings: managed_credits (Cloptima-funded), cloud_byok, or edge_local_byok.
-- `exact_cache_allowed_content_classes` (List of String) Content classes eligible for exact caching.
-- `exact_cache_allowed_models` (List of String) Models eligible for exact caching.
-- `exact_cache_compression_enabled` (Boolean) Enable compression of cached payloads.
-- `exact_cache_compression_threshold_bytes` (Number) Payload size above which compression applies.
-- `exact_cache_enabled` (Boolean) Enable the exact response cache.
-- `exact_cache_key_scope` (List of String) Dimensions included in the exact cache key.
-- `exact_cache_lookup_timeout_ms` (Number) Exact cache lookup timeout in milliseconds.
-- `exact_cache_max_payload_bytes` (Number) Maximum cached payload size in bytes.
+- `exact_cache_enabled` (Boolean) Enable the exact response cache. Cloptima decides which requests are cacheable and keeps cached answers separate per app, team, environment, model, and provider.
 - `exact_cache_mode` (String) Exact cache mode: off, observe, or enforce.
-- `exact_cache_streaming_action` (String) Action for streaming responses under exact caching.
 - `exact_cache_ttl_seconds` (Number) Exact cache entry TTL in seconds.
-- `fail_mode` (String) Policy enforcement behavior when a required service is unavailable: fail_open or fail_closed.
 - `guardrail_profile_id` (String) ID of the cloptima_llm_guardrail_profile this policy evaluates in addition to the organization baseline profile. Omit to evaluate only the baseline. The baseline profile itself cannot be referenced directly.
 - `is_baseline` (Boolean) Whether this policy is the organization baseline. The baseline is never bound: it applies to every request together with the request's winning policy, and the stricter value of each setting governs. Its daily_budget_usd and monthly_budget_usd are a ceiling on all gateway spend in the organization. A baseline sets only modes, edge_offline_keep_serving, provider, model, modality, and tool access lists, request ceilings, rate limits, and budgets. At most one per organization. Changing this value replaces the policy.
 - `max_input_tokens` (Number) Ceiling on input tokens per request.
@@ -118,33 +113,13 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 - `prompt_retention_mode` (String) Prompt/response retention mode for audit logging: none, metadata_only, tool_io, or full.
 - `request_rate_limit_per_minute` (Number) Requests-per-minute ceiling.
 - `required_metadata_keys` (List of String) Request metadata keys, such as team_id or app_id, that every request this policy governs must carry. At most 20 keys.
-- `routing_backoff` (String) Backoff strategy between retries on the same route: none or exponential_jitter.
-- `routing_backoff_initial_ms` (Number) Initial backoff delay in milliseconds. When only one of the initial and maximum backoff is set, the other follows it.
-- `routing_backoff_max_ms` (Number) Maximum backoff delay in milliseconds, up to 5000.
-- `routing_cost_ceiling_usd` (Number) Per-request cost ceiling in USD considered when ranking fallback routes under a cost-aware load_balancing_mode.
-- `routing_credential_pools` (Map of List of String) Provider credentials a route may use, keyed by the route's "provider/model" or by "primary". Each value lists up to four provider credential IDs of that route's provider, tried in order when a credential is rejected. A virtual key bound to a credential for that provider always uses its own credential instead. Without a pool, a fallback route on another provider uses that provider's default credential from the virtual key or the policy. A pool on its own turns on retries: each route is tried with each of its credentials unless an attempt limit is set.
-- `routing_fallback_conditions` (List of String) Failure classes that trigger moving to the next fallback route: route_exhausted, rate_limit, provider_unavailable, authentication, quota, model_unavailable.
-- `routing_fallback_routes` (List of String) Ordered fallback routes as "provider/model" strings, tried in order after the request's own primary route. Setting this (or a max_attempts/max_total_attempts above 1) is what activates resiliency for this policy.
-- `routing_first_output_timeout_ms` (Number) Per-attempt first-output deadline in milliseconds, up to 60000.
-- `routing_load_balancing_mode` (String) Objective used to rank fallback routes when more than one is eligible: cost or region. The already-dispatched primary route is never reordered - this only orders explicit fallbacks.
-- `routing_max_attempts_per_route` (Number) Maximum attempts on a single route before moving to fallback, 1-4.
-- `routing_max_fallback_attempts` (Number) Maximum number of fallback routes to try, on top of the primary route.
-- `routing_max_total_attempts` (Number) Maximum attempts across every route combined for one logical request, 1-8.
-- `routing_request_timeout_ms` (Number) Total logical-request deadline in milliseconds across every attempt, up to 300000. Without it, the request uses the gateway's own timeout, at most 300000.
-- `routing_retryable_classes` (List of String) Failure classes retried within a route before moving on: connect, timeout_before_output, rate_limit, provider_5xx, authentication, quota.
-- `semantic_cache_allowed_apps` (List of String) Apps eligible for semantic caching.
-- `semantic_cache_allowed_content_classes` (List of String) Content classes eligible for semantic caching.
-- `semantic_cache_enabled` (Boolean) Enable the semantic response cache.
+- `semantic_cache_enabled` (Boolean) Enable the semantic response cache. It needs the exact response cache on (`exact_cache_enabled` with `exact_cache_mode` observe or enforce), because a semantic match serves an answer the exact cache stored. Cloptima sets how similar a request must be to match, and a cached answer serves only the app that stored it.
 - `semantic_cache_max_age_seconds` (Number) Maximum age of a semantic cache entry in seconds.
 - `semantic_cache_mode` (String) Semantic cache mode: off, observe, or enforce. An enforce policy that needs approval only observes until the approval is complete; check approval status in the Cloptima console.
-- `semantic_cache_review_required` (Boolean) Require human review before a semantic cache entry becomes servable.
-- `semantic_cache_similarity_threshold` (Number) Minimum similarity score for a semantic cache hit.
 - `token_rate_limit_per_minute` (Number) Tokens-per-minute ceiling.
 
 ### Read-Only
 
 - `created_at` (String) Creation timestamp.
-- `exact_cache_allowed_routes` (List of String) Routes eligible for exact caching. Determined by Cloptima and not directly configurable.
 - `id` (String) Policy ID.
-- `semantic_cache_allowed_routes` (List of String) Routes eligible for semantic caching. Determined by Cloptima and not directly configurable.
 - `updated_at` (String) Last update timestamp.

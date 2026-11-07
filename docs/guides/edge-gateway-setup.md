@@ -138,7 +138,7 @@ Edge gateways do not have budgets of their own. A policy's `daily_budget_usd` an
 - Under a blocking budget (`budget_mode = "hard"`), each edge gateway holds a share of the budget's remaining room for the current UTC day, also counted toward the organization ceiling. It admits requests against that share locally and asks Cloptima for more in the background.
 - Cloptima sizes each share from the room left in the budget and never grants more than that room, so all gateways together stay within one budget.
 - Each edge gateway reports its spend about every 30 seconds. When the UTC day ends, the day's share closes at what the edge actually spent.
-- If an edge gateway asks Cloptima for more budget and the request fails, the policy's `fail_mode` decides: `fail_closed` refuses requests that need more budget, and `fail_open` keeps serving and counts the spend.
+- If an edge gateway asks Cloptima for more budget and the request fails, the edge gateway keeps serving and counts the spend.
 - If an edge gateway has lost contact with Cloptima, the policy's `edge_offline_keep_serving` decides instead. When it is `true` (the default), the edge gateway keeps serving for up to 24 hours and applies the spend to your budgets when it reconnects. When it is `false`, the edge gateway serves only within the budget share it already holds.
 
 There is nothing to configure for this: share sizes and refresh timing are managed by Cloptima. To give one group of edge gateways a budget of its own, bind a separate policy to the virtual keys or environment that group serves:

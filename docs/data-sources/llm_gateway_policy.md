@@ -46,7 +46,6 @@ output "policy_allowed_models" {
 - `edge_offline_keep_serving` (Boolean) Whether an edge gateway that loses contact with Cloptima keeps serving for up to 24 hours, counting spend on the edge and applying it to your budgets when it reconnects.
 - `exact_cache_enabled` (Boolean) Whether exact match caching is enabled.
 - `exact_cache_mode` (String) Exact cache mode: off, observe, or enforce.
-- `fail_mode` (String) Policy enforcement behavior when a required service is unavailable: fail_open or fail_closed.
 - `is_baseline` (Boolean) Whether this policy is the organization baseline, applied to every request together with its winning policy.
 - `mode` (String) Policy enforcement mode: observe or enforce.
 - `monthly_budget_usd` (Number) Monthly spend ceiling in USD.

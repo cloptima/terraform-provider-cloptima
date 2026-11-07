@@ -15,7 +15,7 @@ A reusable, versioned guardrail profile. The organization baseline profile appli
 ```terraform
 resource "cloptima_llm_guardrail_profile" "protect_customer_data" {
   name        = "Protect customer data"
-  description = "Redacts credentials and US personal data from requests, blocks internal project names, and checks requests and responses for harmful content"
+  description = "Redacts credentials and US personal data from requests, blocks internal project names, and checks requests and responses for harmful content, refusing any request it cannot check"
 
   definition = {
     protect = [
@@ -24,7 +24,7 @@ resource "cloptima_llm_guardrail_profile" "protect_customer_data" {
       { rule = "project_codenames", match = { terms = ["project falcon", "blue heron"] }, action = "block" },
       { rule = "employee_id", match = { label = "(?i:employee id|badge)", value = "E\\d{6}" }, action = "redact" },
     ]
-    content_safety = { kind = "cloptima_managed" }
+    content_safety = { kind = "cloptima_managed", on_unavailable = "block" }
   }
 }
 ```
@@ -59,7 +59,7 @@ Required:
 
 Optional:
 
-- `content_safety` (Attributes) Checks requests and responses for harmful content and blocks it. Set kind and only the fields that kind takes: cloptima_managed takes none; the organization's own azure_content_safety takes credential_id and endpoint, bedrock_guardrails takes credential_id, region, guardrail_id, and guardrail_version, google_model_armor takes credential_id and template_name, and webhook takes url, credential_id (optional), and auth_header (optional, with credential_id). (see [below for nested schema](#nestedatt--definition--content_safety))
+- `content_safety` (Attributes) Checks requests and responses for harmful content and blocks it. Set kind and only the fields that kind takes: cloptima_managed takes none; the organization's own azure_content_safety takes credential_id and endpoint, bedrock_guardrails takes credential_id, region, guardrail_id, and guardrail_version, google_model_armor takes credential_id and template_name, and webhook takes url, credential_id (optional), and auth_header (optional, with credential_id). Every kind takes on_unavailable. (see [below for nested schema](#nestedatt--definition--content_safety))
 
 <a id="nestedatt--definition--protect"></a>
 ### Nested Schema for `definition.protect`
@@ -101,6 +101,7 @@ Optional:
 - `endpoint` (String) The Azure AI Content Safety endpoint.
 - `guardrail_id` (String) The Bedrock guardrail ID.
 - `guardrail_version` (String) The Bedrock guardrail version: DRAFT or a version number.
+- `on_unavailable` (String) What a request does when this check cannot run, for example when the check times out, is unreachable, or cannot authenticate: continue (the default) goes on with the profile's protect rules, and block refuses the request. On an edge gateway, a cloptima_managed check refuses the request with block and is skipped with continue.
 - `region` (String) The AWS region of the Bedrock guardrail.
 - `template_name` (String) The Model Armor template, as projects/PROJECT/locations/LOCATION/templates/TEMPLATE.
 - `url` (String) The webhook URL.

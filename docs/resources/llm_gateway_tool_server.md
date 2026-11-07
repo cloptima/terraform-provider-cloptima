@@ -36,7 +36,7 @@ resource "cloptima_llm_gateway_tool_server" "internal_mcp" {
 
 ### Required
 
-- `name` (String) Tool server name, referenced from policy allow/deny lists.
+- `name` (String) Tool server name, 5 to 100 characters, referenced from policy allow/deny lists.
 
 ### Optional
 
