@@ -42,7 +42,7 @@ output "copilot_virtual_key_token" {
 
 ### Required
 
-- `name` (String) Virtual key display name, 5 to 100 characters.
+- `name` (String) Virtual key display name, 5 to 64 characters.
 
 ### Optional
 

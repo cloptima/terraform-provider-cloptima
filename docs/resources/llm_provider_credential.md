@@ -52,7 +52,7 @@ resource "cloptima_llm_provider_credential" "bedrock" {
 
 ### Required
 
-- `display_name` (String) Credential display name, 5 to 100 characters, unique per (customer, provider) among non-revoked credentials.
+- `display_name` (String) Credential display name, 5 to 64 characters, unique per (customer, provider) among non-revoked credentials.
 - `provider_name` (String) Provider name, e.g. openai, anthropic, vertex_ai, bedrock. Named provider_name, not provider, because Terraform reserves "provider" as a resource meta-argument.
 
 ### Optional

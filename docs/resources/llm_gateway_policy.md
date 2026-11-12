@@ -76,7 +76,7 @@ resource "cloptima_llm_gateway_policy" "org_baseline" {
 
 ### Required
 
-- `name` (String) Policy display name, 5 to 100 characters, unique per customer (case-insensitive).
+- `name` (String) Policy display name, 5 to 64 characters, unique per customer (case-insensitive).
 
 ### Optional
 

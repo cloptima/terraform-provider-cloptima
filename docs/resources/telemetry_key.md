@@ -30,7 +30,7 @@ output "telemetry_access_token" {
 
 ### Required
 
-- `name` (String) Name for this telemetry key, 5 to 100 characters.
+- `name` (String) Name for this telemetry key, 5 to 64 characters.
 
 ### Optional
 

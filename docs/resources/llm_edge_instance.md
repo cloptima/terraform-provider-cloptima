@@ -38,7 +38,7 @@ output "edge_instance_bootstrap_pat" {
 
 ### Required
 
-- `name` (String) Name for this edge instance, 5 to 100 characters.
+- `name` (String) Name for this edge instance, 5 to 64 characters.
 
 ### Optional
 
