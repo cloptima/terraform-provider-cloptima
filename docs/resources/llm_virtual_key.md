@@ -42,15 +42,15 @@ output "copilot_virtual_key_token" {
 
 ### Required
 
+- `app_id` (String) Authoritative app attribution for requests made with this virtual key. Every virtual key names one.
 - `name` (String) Virtual key display name, 5 to 64 characters.
+- `team_id` (String) Authoritative team attribution for requests made with this virtual key. Every virtual key names one.
 
 ### Optional
 
-- `app_id` (String) Authoritative app attribution for requests made with this virtual key.
 - `default_credential_ids` (String) Per-provider default credential IDs as a JSON object.
 - `environment` (String) Authoritative environment attribution for requests made with this virtual key.
 - `expires_in_days` (Number) Virtual key lifetime in days from creation. Changing this value replaces the virtual key (a new secret is minted) rather than updating it in place.
-- `team_id` (String) Authoritative team attribution for requests made with this virtual key.
 
 ### Read-Only
 

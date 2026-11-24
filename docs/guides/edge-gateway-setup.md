@@ -70,7 +70,7 @@ Store the edge PAT in a Kubernetes Secret and install the Cloptima edge gateway 
 ```terraform
 resource "kubernetes_namespace" "ai_gateway" {
   metadata {
-    name = "ai-gateway"
+    name = "cloptima"
   }
 }
 
@@ -86,7 +86,7 @@ resource "kubernetes_secret" "cloptima_edge" {
 }
 
 resource "helm_release" "cloptima_edge" {
-  name       = "cloptima-edge-gateway"
+  name       = "cloptima-edge"
   namespace  = kubernetes_namespace.ai_gateway.metadata[0].name
   repository = "oci://ghcr.io/cloptima/charts"
   chart      = "cloptima-edge-gateway"
@@ -98,16 +98,11 @@ resource "helm_release" "cloptima_edge" {
         key  = "edge-pat"
       }
     }
-    redis = {
-      embedded = {
-        enabled = true
-      }
-    }
   })]
 }
 ```
 
-The chart requires a state store for the gateway. `redis.embedded.enabled = true` deploys one alongside the gateway; to use an existing instance instead, set `redis.url` or `redis.urlSecret`.
+The chart deploys the gateway's state store (Redis) alongside the gateway.
 
 After the gateway starts and registers, the edge instance `status` changes from `pending` to `active`.
 
